@@ -1,14 +1,18 @@
 class DealershipsFinderServices
-  API_BASE_URL = 'https://maps.googleapis.com/maps/api/place'
   EARTH_RADIUS = 6378137.0
   SMALL_CIRCLE_RADIUS = 2000.0 # 2km
 
+  attr_reader :client
+
   def initialize()
+    @client = GooglePlaces::Client.new(ENV['MAPS_API_KEY'])
   end
 
   def find(latitude, longitude, radius)
     circles = find_circles(latitude, longitude, radius)
     dealerships = find_nearby_places(circles)
+
+    puts dealerships.inspect
 
     [dealerships, circles]
   end
@@ -52,9 +56,36 @@ class DealershipsFinderServices
   def find_nearby_places(circles)
     dealerships = []
     circles.each do |circle|
+      # detail true makes an extra call to get the place details (website among other fields)
+      dealership_spots = client.spots(circle[0], circle[1], radius: SMALL_CIRCLE_RADIUS,
+        types: 'car_dealer', detail: true)
 
+      dealerships << upsert_dealerships(dealership_spots)
     end
 
+    dealerships.flatten.uniq
+  end
+
+  def upsert_dealerships(dealership_spots)
+    dealerships = []
+    dealership_spots.each do |dealership_spot|
+      dealerships << Dealership.find_or_create_by(
+        name: dealership_spot.name,
+        website: dealership_spot.url,
+        address_components: dealership_spot.address_components,
+        formatted_address: dealership_spot.formatted_address,
+        formatted_phone_number: dealership_spot.formatted_phone_number,
+        international_phone_number: dealership_spot.international_phone_number,
+        latitude: dealership_spot.lat,
+        longitude: dealership_spot.lng,
+        opening_hours: dealership_spot.opening_hours,
+        google_place_id: dealership_spot.reference,
+        tags: dealership_spot.types,
+        country: dealership_spot.country,
+        city: dealership_spot.city,
+        rating: dealership_spot.rating
+      )
+    end
     dealerships
   end
 end
