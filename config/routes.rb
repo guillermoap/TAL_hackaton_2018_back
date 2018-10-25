@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       mount ActionCable.server => '/action_cable'
       resources :dealerships, only: [:index] do
         get :find, on: :collection
+        get :export, on: :collection
       end
     end
   end
