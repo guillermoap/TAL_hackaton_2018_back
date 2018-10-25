@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::API
+  include ActionController::MimeResponds
+
   before_action :cors_set_access_control_headers
 
   def cors_preflight_check
