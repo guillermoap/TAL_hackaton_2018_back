@@ -14,7 +14,8 @@ module Api
       end
 
       def export
-        dealerships = Dealership.all.limit(500)
+        dealership_ids = params[:dealership_ids].split(',')
+        dealerships = Dealership.where(id: dealership_ids).limit(500)
         filename = "#{Date.today}.csv"
 
         response.headers['Exported-Filename'] = filename
