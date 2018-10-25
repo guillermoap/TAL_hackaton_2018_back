@@ -7,6 +7,13 @@ class DealershipsFinderServices
   end
 
   def find(latitude, longitude, radius)
+    circles = find_circles(latitude, longitude, radius)
+    dealerships = find_nearby_places(circles)
+
+    [dealerships, circles]
+  end
+
+  def find_circles(latitude, longitude, radius)
     final_latitude, final_longitude = add_offset_to_lat_lng(latitude, longitude, radius, radius)
 
     offset_x = -radius + SMALL_CIRCLE_RADIUS
@@ -16,38 +23,21 @@ class DealershipsFinderServices
     )
     initial_longitude = circle_longitude
 
-    puts '---------INITIAL----------'
-    puts latitude
-    puts longitude
-    puts circle_latitude
-    puts circle_longitude
-    puts final_latitude
-    puts final_longitude
-    puts offset_x
-    puts offset_y
-
     circles = [[circle_latitude, circle_longitude]]
 
-    puts circle_latitude - final_latitude < 0
-    puts circle_longitude - final_longitude < 0
     while circle_latitude - final_latitude < 0 && circle_longitude - final_longitude < 0 do
       _, circle_longitude = add_offset_to_lat_lng(circle_latitude, circle_longitude, SMALL_CIRCLE_RADIUS, 0.0)
-      if circle_longitude.abs > final_longitude.abs
+      if circle_longitude > final_longitude
         circle_longitude = initial_longitude
         circle_latitude, _ = add_offset_to_lat_lng(circle_latitude, circle_longitude, 0.0, SMALL_CIRCLE_RADIUS)
       end
 
       circles << [circle_latitude, circle_longitude]
-
-
-      puts circle_latitude
-      puts circle_longitude
     end
 
-    puts '----------------------------'
-    puts circles
-
-    [Dealership.all, circles]
+    # dont want last element
+    circles.pop
+    circles
   end
 
   def add_offset_to_lat_lng(latitude, longitude, offset_x, offset_y)
@@ -57,5 +47,14 @@ class DealershipsFinderServices
       (offset_x / EARTH_RADIUS) * (180.0 / Math::PI) / Math.cos(latitude * Math::PI / 180.0)
 
     [new_latitude, new_longitude]
+  end
+
+  def find_nearby_places(circles)
+    dealerships = []
+    circles.each do |circle|
+
+    end
+
+    dealerships
   end
 end

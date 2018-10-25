@@ -6,9 +6,9 @@ module Api
       end
 
       def find
-        latitude = 30.2047181
-        longitude = -97.7835517
-        radius = 5000.0.to_f
+        latitude = params[:latitude].to_f
+        longitude = params[:longitude].to_f
+        radius = params[:radius].to_f
 
         @dealerships, @circles = DealershipsFinderServices.new().find(latitude, longitude, radius)
       end

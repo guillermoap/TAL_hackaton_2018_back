@@ -1,4 +1,4 @@
-json.dealerships_count @dealerships.count
+json.dealerships_count @dealerships.try(:count)
 json.dealerships @dealerships do |dealership|
   json.id dealership.id
   json.name dealership.name
