@@ -71,7 +71,7 @@ class DealershipsFinderServices
     dealership_spots.each do |dealership_spot|
       dealerships << Dealership.find_or_create_by(
         name: dealership_spot.name,
-        website: dealership_spot.url,
+        website: dealership_spot.website,
         address_components: dealership_spot.address_components,
         formatted_address: dealership_spot.formatted_address,
         formatted_phone_number: dealership_spot.formatted_phone_number,
