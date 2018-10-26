@@ -80,12 +80,16 @@ class DealershipsFinderServices
         longitude: dealership_spot.lng,
         opening_hours: dealership_spot.opening_hours,
         google_place_id: dealership_spot.reference,
-        tags: dealership_spot.types,
+        tags: filter_tags(dealership_spot.types),
         country: dealership_spot.country,
         city: dealership_spot.city,
         rating: dealership_spot.rating
       )
     end
     dealerships
+  end
+
+  def filter_tags(tags)
+    tags.reject { |a| ['point_of_interest', 'establishment', 'store'].include?(a) }
   end
 end
